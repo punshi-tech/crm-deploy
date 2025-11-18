@@ -61,6 +61,12 @@ app.get("/test", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
+// sending request every 5 minutes using cronjob to prevent render from sleeping
+app.get("/", (req, res) => {
+  res.send("🚀 CRM Backend Running!");
+});
+
 app.listen(PORT, () =>
   console.log(`🚀 Server running on http://localhost:${PORT}`)
 );
