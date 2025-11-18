@@ -4,6 +4,9 @@ node_modules/
 # Environment variables
 .env
 
+# Project Accounts
+accounts/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
