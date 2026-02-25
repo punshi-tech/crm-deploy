@@ -185,69 +185,6 @@ exports.clientRegister = async (req, res) => {
   }
 };
 
-// exports.clientLogin = async (req, res) => {
-//   try {
-//     const { username, password } = req.body;
-//     if (!username || !password)
-//       return res
-//         .status(400)
-//         .json({ message: "username and password are required" });
-
-//     const [rows] = await db.query(
-//       "SELECT id, username, password FROM clients WHERE username=?",
-//       [username]
-//     );
-//     if (rows.length === 0)
-//       return res.status(404).json({ message: "User not found" });
-
-//     const user = rows[0];
-//     const isMatched = await bcrypt.compare(password, user.password);
-//     if (!isMatched)
-//       return res.status(401).json({ message: "Invalid user credentials" });
-
-//     const [refreshRows] = await db.query(
-//       "SELECT refresh_token FROM clients WHERE username = ?",
-//       [username]
-//     );
-
-//     if (refreshRows.length > 0 && refreshRows[0].refresh_token !== null) {
-//       await db.query(
-//         "UPDATE clients SET refresh_token = NULL WHERE username = ?",
-//         [username]
-//       );
-//     }
-//     const refreshToken = jwt.sign(
-//       { username },
-//       process.env.REFRESH_SECRET_TOKEN,
-//       { expiresIn: "7d" }
-//     );
-
-//     // تخزين التوكين الجديد في قاعدة البيانات
-//     await db.query("UPDATE clients SET refresh_token = ? WHERE username = ?", [
-//       refreshToken,
-//       username,
-//     ]);
-
-//     const accessToken = jwt.sign(
-//       {
-//         id: user.id,
-//         username,
-//       },
-//       process.env.ACCESS_SECRET_TOKEN,
-//       { expiresIn: "1m" }
-//     );
-//     res.status(200).json({
-//       message: "User logged in successfully",
-//       username,
-//       accessToken,
-//       refreshToken,
-//     });
-//   } catch (err) {
-//     console.log(`Internal server error ${err}`);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
-
 exports.clientLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -372,6 +309,8 @@ exports.refreshTokenFunction = async (req, res) => {
     } else {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
+
+    console.log(newAccessToken)
 
     res.json({
       accessToken: newAccessToken,

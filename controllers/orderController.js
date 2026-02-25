@@ -13,6 +13,7 @@ const priceCalculation = function (rows, cart) {
     return {
       id: product.id,
       product_name: product.product_name,
+      product_image: product.product_image,
       unit_price: Number(product.price),
       quantity,
       total_price,
@@ -42,7 +43,7 @@ exports.previewCart = async (req, res) => {
 
     // جلب المنتجات من قاعدة البيانات
     const [rows] = await db.query(
-      `SELECT id, product_name, COALESCE(current_price, base_price) AS price
+      `SELECT id, product_image, product_name, COALESCE(current_price, base_price) AS price
         FROM products
         WHERE id IN (${productIds.join(",")})`
     );
@@ -61,8 +62,8 @@ exports.previewCart = async (req, res) => {
       });
     }
     const { result, cartTotal } = priceCalculation(rows, cart);
+    console.log(cartTotal)
     // 🧮 حساب السعر النهائي لكل منتج
-
     return res.status(200).json({
       products: result,
       total_cart_price: cartTotal,
@@ -257,11 +258,11 @@ exports.getOrders = async (req, res) => {
           ...item,
           product: product
             ? {
-                id: product.id,
-                name: product.product_name,
-                price: product.price,
-                image: product.product_image,
-              }
+              id: product.id,
+              name: product.product_name,
+              price: product.price,
+              image: product.product_image,
+            }
             : null, // في حال لم يُعثر على المنتج
         };
       });
@@ -419,8 +420,11 @@ exports.trackingOrder = async (req, res) => {
 
 exports.deleteOrder = async (req, res) => {
   try {
+    console.log(req.params)
     const clientId = req.user.id;
     const { id: orderID } = req.params;
+
+    console.log(orderID)
 
     // إذا لم يكن للمستخدم دور، فهو عميل
     if (req.user.role === undefined) {
@@ -428,6 +432,8 @@ exports.deleteOrder = async (req, res) => {
         "SELECT * FROM orders WHERE id = ? AND client_id = ?",
         [orderID, clientId]
       );
+
+      console.log(orderRow)
 
       // تحقق من وجود الطلب فعلاً
       if (orderRow.length === 0) {

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const imagekit = require("../config/imagekit");
 const multer = require("multer");
+const { response } = require("express");
 const upload = multer({ dist: "uploads/" });
 
 const uploadMainImage = async (file) => {
@@ -100,14 +101,15 @@ exports.addProduct = async (req, res) => {
   }
 };
 
-// get (ALL/ Speciefic) Products
+// get (ALL/ Speciefic) Products 
 exports.getProducts = async (req, res) => {
+  console.log("new request arrived")
   const {
     search,
     category,
     sort_by,
     sort_order,
-    items_per_page = 8,
+    items_per_page = 12,
     current_page = 1,
   } = req.query;
 
@@ -308,6 +310,92 @@ exports.editProduct = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: "Database error" });
+  }
+};
+
+
+// New Route ((((((((((((In MAlaysia))))))))))))
+// Get Products By Id
+// exports.getProductById = async (req, res) => {
+//   try {
+//     const id = Number(req.params.id)
+
+//     const [result] = await db.query(
+//       `
+//       SELECT 
+//         p.*,
+//         c.category,
+//         g.id AS gallery_id,
+//         g.image_path
+//       FROM products AS p
+//       JOIN product_categories AS c 
+//         ON p.category_id = c.id
+//       LEFT JOIN product_gallery AS g 
+//         ON g.product_id = p.id
+//       WHERE p.id = ?;
+//     `,
+//       [id]
+//     )
+//     if (result[0].length === 0) {
+//       return res.status(404).json({
+//         message: `Product With ID ${id} Not Found`
+//       })
+//     }
+
+//     return res.status(200).json(result[0]) // نرجع المنتج نفسه وليس مصفوفة
+
+//   } catch (err) {
+//     return res.status(500).json({ message: "Database error" })
+//   }
+// }
+
+// After Adding Gallery Images
+exports.getProductById = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const [rows] = await db.query(`
+      SELECT 
+        p.*,
+        c.category,
+        g.image_path
+      FROM products p
+      JOIN product_categories c 
+        ON p.category_id = c.id
+      LEFT JOIN product_gallery g 
+        ON g.product_id = p.id
+      WHERE p.id = ?;
+    `, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // 🟢 نبني object واحد
+    const product = {
+      id: rows[0].id,
+      product_name: rows[0].product_name,
+      product_image: rows[0].product_image,
+      category: rows[0].category,
+      info: rows[0].info,
+      base_price: rows[0].base_price,
+      current_price: rows[0].current_price,
+      created_at: rows[0].created_at,
+      gallery: []
+    };
+
+    // 🟢 نجمع الصور داخل array
+    rows.forEach(row => {
+      if (row.image_path) {
+        product.gallery.push(row.image_path);
+      }
+    });
+
+    return res.status(200).json(product);
+
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: "Database error" });
   }
 };
