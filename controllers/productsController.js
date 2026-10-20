@@ -311,3 +311,53 @@ exports.editProduct = async (req, res) => {
     return res.status(500).json({ message: "Database error" });
   }
 };
+
+
+exports.getProductById = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const [rows] = await db.query(`
+      SELECT 
+        p.*,
+        c.category,
+        g.image_path
+      FROM products p
+      JOIN product_categories c 
+        ON p.category_id = c.id
+      LEFT JOIN product_gallery g 
+        ON g.product_id = p.id
+      WHERE p.id = ?;
+    `, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // 🟢 نبني object واحد
+    const product = {
+      id: rows[0].id,
+      product_name: rows[0].product_name,
+      product_image: rows[0].product_image,
+      category: rows[0].category,
+      info: rows[0].info,
+      base_price: rows[0].base_price,
+      current_price: rows[0].current_price,
+      created_at: rows[0].created_at,
+      gallery: []
+    };
+
+    // 🟢 نجمع الصور داخل array
+    rows.forEach(row => {
+      if (row.image_path) {
+        product.gallery.push(row.image_path);
+      }
+    });
+
+    return res.status(200).json(product);
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Database error" });
+  }
+};
