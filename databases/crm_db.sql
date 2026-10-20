@@ -1,4 +1,3 @@
-USE sql7807695;
 CREATE TABLE roles (
   id INT AUTO_INCREMENT PRIMARY KEY,
   role_name VARCHAR(50) NOT NULL UNIQUE
@@ -20,7 +19,8 @@ CREATE TABLE employees (
 ALTER TABLE employees
 ADD COLUMN refresh_token VARCHAR(512) DEFAULT NULL;
 
-INSERT INTO roles (role_name) VALUES("customer_support");
+INSERT INTO roles (role_name) VALUES("adminstrator"), ("sales person"), ("Marketing Specialist"), ("customer_support"), ("Accountant");
+
 
 CREATE TABLE clients (
   id INT AUTO_INCREMENT PRIMARY KEY, 
@@ -42,6 +42,7 @@ CREATE TABLE product_categories (id INT AUTO_INCREMENT PRIMARY KEY, category VAR
 INSERT INTO product_categories (category) VALUES ('furniture');
 INSERT INTO product_categories (category) VALUES ('accessories');
 INSERT INTO product_categories (category) VALUES ('resin_epoxy');
+INSERT INTO product_categories (category) VALUES ("decoration");
 INSERT INTO product_categories (category) VALUES ('tools');
 
 CREATE TABLE products (
@@ -162,6 +163,3 @@ ADD CONSTRAINT fk_tickets_clients
 FOREIGN KEY (client_id) REFERENCES clients(id)
 ON DELETE SET NULL
 ON UPDATE CASCADE;
-
-INSERT INTO roles (role_name) VALUES("accountant");
-INSERT INTO product_categories (category) VALUES ("decoration");

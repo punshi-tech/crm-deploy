@@ -6,10 +6,21 @@ const multer = require("multer");
 const { route } = require("./userRoutes");
 const upload = multer({ storage: multer.memoryStorage() });
 
-// add Product
+// add Product  (((((((((Original Route)))))))))
+// router.post(
+//   "/add_product",
+//   authMiddleware,
+//   upload.fields([
+//     { name: "mainImage", maxCount: 1 },
+//     { name: "galleryImages", maxCount: 5 },
+//   ]),
+//   productsController.addProduct
+// );
+
+
+// add Product  (((((((((Test Route)))))))))
 router.post(
   "/add_product",
-  authMiddleware,
   upload.fields([
     { name: "mainImage", maxCount: 1 },
     { name: "galleryImages", maxCount: 5 },
@@ -17,8 +28,13 @@ router.post(
   productsController.addProduct
 );
 
-// get (ALL or speciefic) proucts
-router.get("/get_Products", authMiddleware, productsController.getProducts);
+// get (ALL or speciefic) proucts (((((ORIGINAL ROUTE)))))
+// router.get("/get_Products", authMiddleware, productsController.getProducts);
+
+
+
+// ((((((TESTING ONE))))))
+router.get("/get_Products", productsController.getProducts);
 
 // Delete Product
 router.delete(
