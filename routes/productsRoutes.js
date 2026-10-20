@@ -57,4 +57,6 @@ router.patch(
   productsController.editProduct
 );
 
+router.get("/get_product_by_id/:id", productsController.getProductById)
+
 module.exports = router;
